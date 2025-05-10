@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+    <head><meta charset="utf-8"><title>Latest IT news.</title></head>
+    <body>
+        <h1>ITニュース(最新10件)</h1>
+        {% for site, article in news.items() %}
+            <h2>{{ site }}</h2>
+            <ul>
+                {% for a in article %}
+                    <li><a href="{{ a.link }}" target="_blank">{{ a.title }}</a></li>
+                {% endfor %}
+            </ul>
+        {% endfor %}
+    </body>
+</html>
