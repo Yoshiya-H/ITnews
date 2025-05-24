@@ -1,2 +1,7 @@
 .venv/
 __pycache__/
+terraform/追加検討.md
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
+terraform/terraform.tfvars
+terraform/.terraform/
