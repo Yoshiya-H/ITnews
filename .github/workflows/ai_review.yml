@@ -17,7 +17,7 @@ jobs:
       - name: Get code diff
         id: get_diff
         run: |
-          echo "diff=$(git diff ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} >> $GITHUB_OUTPUT)"
+          echo "diff=$(git diff ${{ github.event.before }} ${{ github.sha }} >> $GITHUB_OUTPUT)"
   
       - name: Install transformers
         run: |
@@ -27,6 +27,6 @@ jobs:
         run: |
           python ./.github/workflows/scripts/local_ai_review.py
         env: 
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          BASE_SHA: ${{ github.event.before }}
+          HEAD_SHA: ${{ github.sha }}
           DIFF: ${{ steps.get_diff.outputs.diff }}
