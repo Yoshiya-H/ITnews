@@ -1,0 +1,26 @@
+name: Free Local AI Review
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  ai-review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'
+      
+      - name: Install transformers
+        run: |
+          pip install transformers torch
+      
+      - name: Local AI Review
+        run: |
+          python scripts/local_ai_review.py
+        env: 
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
