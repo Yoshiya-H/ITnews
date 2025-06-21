@@ -27,4 +27,6 @@ jobs:
         run: |
           python ./.github/workflows/scripts/local_ai_review.py
         env: 
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           DIFF: ${{ steps.get_diff.outputs.diff }}
