@@ -17,5 +17,5 @@ def get_code_diff():
 reviewer = pipeline("text-generation", model="microsoft/CodeBERT-base")
 diff = get_code_diff()
 
-review = reviewer(f"Review this code diff in Japanese: {diff[:1000]}")  # トークン制限に注意
+review = reviewer(f"Review this code diff in Japanese: {diff[:1500]}")  # トークン制限に注意
 print(review)
