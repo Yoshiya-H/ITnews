@@ -13,8 +13,7 @@ def get_code_diff():
     ], capture_output=True, text=True, check=False)
     return result.stdout
 
-# 無料のコードレビューモデル使用
-reviewer = pipeline("text-generation", model="microsoft/CodeBERT-base")
+reviewer = pipeline("text-generation", model="Salesforce/codegen-350M-mono")
 diff = get_code_diff()
 
 review = reviewer(f"Review this code diff in Japanese: {diff[:1500]}")  # トークン制限に注意
