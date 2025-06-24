@@ -57,8 +57,7 @@ def get_ai_review(diff):
         ]
     )
     response_result = response.choices[0].message.content
-    response_md = ''.join(response_result.values())
-    return response_md
+    return response_result
 
 if __name__ == "__main__":
     diff = get_pr_diff()
