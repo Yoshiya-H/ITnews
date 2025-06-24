@@ -48,14 +48,18 @@ def get_ai_review(diff):
 
 def post_review_comments(review_result):
     """レビュー結果をコメント投稿"""
+    print(f'review_result:\n{review_result}')
     url = f'{PR_API_URL}/commits'
     headers = {
         'Authorization': f'token {GITHUB_TOKEN}',
         'Accept': 'application/vnd.github+json'
     }
     pr_commits_response = requests.get(url, headers=headers)
+    print(f'pr_commits_response:\n{pr_commits_response}')
     pr_commits = pr_commits_response.json()
+    print(f'pr_commits:\n{pr_commits}')
     last_commit = pr_commits[-1]['sha']
+    print(f'last_commit:\n{last_commit}')
     for file in review_result["files"]:
         for review in file["reviews"]:
             comment_url = f'{PR_API_URL}/comments'
