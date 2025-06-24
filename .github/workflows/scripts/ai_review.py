@@ -1,10 +1,7 @@
 import os
 import sys
-# import json
 import requests
 from openai import OpenAI
-
-#diff = sys.argv[1]
 
 AI_API_KEY = os.getenv("AI_API_KEY")
 SYSTEM_PROMPT = ('You are a senior infrastracture engineer reviewing a git diff.\n'
@@ -24,7 +21,7 @@ SYSTEM_PROMPT = ('You are a senior infrastracture engineer reviewing a git diff.
                 'Only output the Markdown — do not include any explanations outside of the formatted review.\n'
                 )
 USER_PROMPT = "Please review the following code differences.:\n\n"
-MODEL= "gemini-1.5-flash"
+MODEL= "gemini-2.0-flash-lite"
 
 GITHUB_TOKEN = os.getenv('GH_TOKEN')
 REPOSITORY = os.getenv("REPOSITORY")
@@ -38,7 +35,11 @@ def get_pr_diff():
         'Authorization': f'token {GITHUB_TOKEN}',
         'Accept': 'application/vnd.github+json'
     }
-    response = requests.get(url, headers=headers)
+    try:
+        response = requests.get(url, headers=headers, timeout=60)
+    except requests.exceptions.RequestException as e:
+        print(f'Error: {e}')
+        sys.exit(1)
     pr_diff = response.json()
     return pr_diff
 
@@ -49,17 +50,20 @@ def get_ai_review(diff):
         base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
     )
 
-    response = client.chat.completions.create(
-        model=MODEL,
-        messages=[
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": f'{USER_PROMPT}{diff}'}
-        ]
-    )
-    response_result = response.choices[0].message.content
+    try:
+        response = client.chat.completions.create(
+            model=MODEL,
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": f'{USER_PROMPT}{diff}'}
+            ]
+        )
+        response_result = response.choices[0].message.content
+    except Exception as e:
+        print(f'Error: {e}')
+        sys.exit(1)
     return response_result
 
 if __name__ == "__main__":
     diff = get_pr_diff()
     print(get_ai_review(diff))
-
