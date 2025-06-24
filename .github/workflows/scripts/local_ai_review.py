@@ -1,6 +1,6 @@
 import os
 import sys
-import json
+# import json
 import requests
 from openai import OpenAI
 
@@ -58,16 +58,19 @@ def get_ai_review(diff):
         response_format={"type":"json_object"}
     )
     response_result = response.choices[0].message.content
+    print(f'response_result: \n{response_result}')
     return response_result
 
 def post_review_comments(review_result):
     """レビュー結果をファイル出力"""
     print(f'review_result: \n{review_result}')
-    with open("comments.md", 'w',encoding='utf-8') as f:
+    with open("./.github/workflows/scripts/comments.md", 'w',encoding='utf-8') as f:
         f.write(review_result)
 
 
 if __name__ == "__main__":
     diff = get_pr_diff()
+    print(f'diff: \n{diff}')
     review_result = get_ai_review(diff)
-    post_review_comments(json.loads(review_result))
+    print(f'review_result: \n{review_result}')
+    post_review_comments(review_result)
