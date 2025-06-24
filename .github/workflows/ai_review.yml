@@ -22,13 +22,26 @@ jobs:
       
       - name: AI Review
         run: |
-          python ./.github/workflows/scripts/local_ai_review.py
+          python ./.github/workflows/scripts/local_ai_review.py > comments.md
         env:
           AI_API_KEY: ${{ secrets.AI_API_KEY }}
           REPOSITORY: "Yoshiya-H/ITnews"
           PR_NUMBER: ${{ github.event.number }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Upload result for ai-review
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-review-commmets
+          path: comments.md
+
+  post-comments:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download result for ai-review
+        uses: actions/download-artifact@v4
+        with:
+          name: ai-review-commmets
       - name: Post comments
         run: |
           gh pr comment ${{ github.event.number }} --body-file comments.md

@@ -61,13 +61,7 @@ def get_ai_review(diff):
     response_result = response.choices[0].message.content
     return response_result
 
-def post_review_comments(review_result):
-    """レビュー結果をファイル出力"""
-    with open("./.github/workflows/scripts/comments.md", 'w',encoding='utf-8') as f:
-        f.write(review_result)
-
-
 if __name__ == "__main__":
     diff = get_pr_diff()
-    review_result = get_ai_review(diff)
-    post_review_comments(review_result)
+    get_ai_review(diff)
+
