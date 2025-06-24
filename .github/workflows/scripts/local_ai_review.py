@@ -9,7 +9,7 @@ from openai import OpenAI
 AI_API_KEY = os.getenv("AI_API_KEY")
 SYSTEM_PROMPT = "You are a professional infrastructure engineer who is good at code reviews. When reviewing code, please try to show the source whenever possible."
 USER_PROMPT = "Please review the following code differences in Japanese. Please output the good points and improvements.:\n\n"
-MODEL= "gemini-1.5-flash-lite"
+MODEL= "gemini-1.5-flash"
 
 GITHUB_TOKEN = os.getenv('GH_TOKEN')
 REPOSITORY = os.getenv("REPOSITORY")
