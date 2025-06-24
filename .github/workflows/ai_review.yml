@@ -39,10 +39,14 @@ jobs:
     needs: ai-review
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Download result for ai-review
         uses: actions/download-artifact@v4
         with:
           name: ai-review-commmets
+
       - name: Post comments
         run: |
           gh pr comment ${{ github.event.number }} --body-file comments.md

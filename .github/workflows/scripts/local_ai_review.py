@@ -9,7 +9,6 @@ from openai import OpenAI
 AI_API_KEY = os.getenv("AI_API_KEY")
 SYSTEM_PROMPT = ('You are a senior infrastracture engineer reviewing a git diff.\n'
                 '- Write a Markdown-formatted code review summary that can be used as a commit comment.\n'
-                '- Concatenate all content onto one line and use MarkDown syntax to indicate line breaks.\n'
                 '- Include sources in your review comments whenever possible.\n'
                 '- Write in Japanese.\n'
                 'The structure must include the following sections:\n\n'
@@ -55,11 +54,11 @@ def get_ai_review(diff):
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": f'{USER_PROMPT}{diff}'}
-        ],
-        response_format={"type":"json_object"}
+        ]
     )
     response_result = response.choices[0].message.content
-    return response_result
+    response_md = ''.join(response_result.values())
+    return response_md
 
 if __name__ == "__main__":
     diff = get_pr_diff()
