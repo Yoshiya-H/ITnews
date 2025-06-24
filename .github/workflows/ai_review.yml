@@ -23,6 +23,7 @@ jobs:
       - name: Install transformers
         run: |
           pip install openai
+          pip install PyGithub
       
       - name: Local AI Review
         run: |
