@@ -67,6 +67,7 @@ def post_review_comments(review_result):
             }
             requests.post(comment_url, headers=headers, data=json.dumps(comment_data))
 
+print(ai_api_key)
 diff = get_pr_diff()
 review_result = get_ai_review(diff)
 post_review_comments(json.loads(review_result))
