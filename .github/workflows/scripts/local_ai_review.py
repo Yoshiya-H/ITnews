@@ -8,9 +8,10 @@ from openai import OpenAI
 
 AI_API_KEY = os.getenv("AI_API_KEY")
 SYSTEM_PROMPT = ('You are a senior infrastracture engineer reviewing a git diff.\n'
-                'Please write a Markdown-formatted code review summary that can be used as a commit comment.\n'
-                'Please concatenate all content onto one line and use MarkDown syntax to indicate line breaks.\n'
-                'Please include sources in your review comments whenever possible.\n'
+                '- Write a Markdown-formatted code review summary that can be used as a commit comment.\n'
+                '- Concatenate all content onto one line and use MarkDown syntax to indicate line breaks.\n'
+                '- Include sources in your review comments whenever possible.\n'
+                '- Write in Japanese.\n'
                 'The structure must include the following sections:\n\n'
                 '1. **Overview**: A high-level summary of what was changed and why.\n\n'
                 '2. **File-by-File Review**: For each file that has changes:\n'
@@ -58,19 +59,15 @@ def get_ai_review(diff):
         response_format={"type":"json_object"}
     )
     response_result = response.choices[0].message.content
-    print(f'response_result: \n{response_result}')
     return response_result
 
 def post_review_comments(review_result):
     """レビュー結果をファイル出力"""
-    print(f'review_result: \n{review_result}')
     with open("./.github/workflows/scripts/comments.md", 'w',encoding='utf-8') as f:
         f.write(review_result)
 
 
 if __name__ == "__main__":
     diff = get_pr_diff()
-    print(f'diff: \n{diff}')
     review_result = get_ai_review(diff)
-    print(f'review_result: \n{review_result}')
     post_review_comments(review_result)
