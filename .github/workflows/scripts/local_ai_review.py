@@ -7,8 +7,19 @@ from openai import OpenAI
 #diff = sys.argv[1]
 
 AI_API_KEY = os.getenv("AI_API_KEY")
-SYSTEM_PROMPT = "You are a professional infrastructure engineer who is good at code reviews. When reviewing code, please try to show the source whenever possible."
-USER_PROMPT = "Please review the following code differences in Japanese. Please output the good points and improvements.:\n\n"
+SYSTEM_PROMPT = ('You are a professional infrastructure engineer who is good at code reviews.\n\n'
+              '- Please try to show the source whenever possible\n'
+              '- Be sure to comment on areas for improvement.\n'
+              '- Please make review comments in Japanese.\n'
+              '- Please prefix your review comments with one of the following labels "MUST:","IMPORTNAT:","NOTICE:".\n'
+              '  - MUST: must be modified\n'
+              '  - IMPORTNAT: Reference\n'
+              '  - NOTICE: Proposals that do not require modification\n'
+              '- The following json format should be followed.\n'
+              '{"files":[{"fileName":"<file_name>","reviews": [{"lineNumber":<line_number>,"reviewComment":"<review comment>"}]}]}\n'
+              '- If there is no review comment, please answer {"files":[]}\n'
+              )
+USER_PROMPT = "Please review the following code differences.:\n\n"
 MODEL= "gemini-1.5-flash"
 
 GITHUB_TOKEN = os.getenv('GH_TOKEN')
@@ -29,7 +40,6 @@ def get_pr_diff():
 
 def get_ai_review(diff):
     """AIによるコードレビュー"""
-    # print(AI_API_KEY)
     client = OpenAI(
         api_key=AI_API_KEY,
         base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
@@ -55,11 +65,8 @@ def post_review_comments(review_result):
         'Accept': 'application/vnd.github+json'
     }
     pr_commits_response = requests.get(url, headers=headers)
-    print(f'pr_commits_response:\n{pr_commits_response}')
     pr_commits = pr_commits_response.json()
-    print(f'pr_commits:\n{pr_commits}')
     last_commit = pr_commits[-1]['sha']
-    print(f'last_commit:\n{last_commit}')
     for file in review_result["files"]:
         for review in file["reviews"]:
             comment_url = f'{PR_API_URL}/comments'
