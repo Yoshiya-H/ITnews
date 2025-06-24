@@ -4,10 +4,9 @@ import json
 import requests
 from openai import OpenAI
 
-ai_api_key = os.getenv("AI_API_KEY")
-
 #diff = sys.argv[1]
 
+AI_API_KEY = os.getenv("AI_API_KEY")
 SYSTEM_PROMPT = "You are a professional infrastructure engineer who is good at code reviews. When reviewing code, please try to show the source whenever possible."
 USER_PROMPT = "Please review the following code differences in Japanese. Please output the good points and improvements.:\n\n"
 MODEL= "gemini-1.5-flash-lite"
@@ -30,8 +29,9 @@ def get_pr_diff():
 
 def get_ai_review(diff):
     """AIによるコードレビュー"""
+    print(AI_API_KEY)
     client = OpenAI(
-        api_key=ai_api_key,
+        api_key=AI_API_KEY,
         base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
     )
 
@@ -67,7 +67,7 @@ def post_review_comments(review_result):
             }
             requests.post(comment_url, headers=headers, data=json.dumps(comment_data))
 
-print(ai_api_key)
-diff = get_pr_diff()
-review_result = get_ai_review(diff)
-post_review_comments(json.loads(review_result))
+if __name__ == "__main__":
+    diff = get_pr_diff()
+    review_result = get_ai_review(diff)
+    post_review_comments(json.loads(review_result))
