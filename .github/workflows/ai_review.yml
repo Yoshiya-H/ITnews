@@ -20,7 +20,7 @@ jobs:
           pip install openai
           pip install PyGithub
       
-      - name: Local AI Review
+      - name: AI Review
         run: |
           python ./.github/workflows/scripts/local_ai_review.py
         env:
@@ -28,3 +28,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPOSITORY: "Yoshiya-H/ITnews"
           PR_NUMBER: ${{ github.event.number }}
+
+      - name: Post comments
+        run: |
+          gh pr comment ${{ github.event.number }} --body-file comments.md

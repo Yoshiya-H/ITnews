@@ -7,18 +7,22 @@ from openai import OpenAI
 #diff = sys.argv[1]
 
 AI_API_KEY = os.getenv("AI_API_KEY")
-SYSTEM_PROMPT = ('You are a professional infrastructure engineer who is good at code reviews.\n\n'
-              '- Please try to show the source whenever possible\n'
-              '- Be sure to comment on areas for improvement.\n'
-              '- Please make review comments in Japanese.\n'
-              '- Please prefix your review comments with one of the following labels "MUST:","IMPORTNAT:","NOTICE:".\n'
-              '  - MUST: must be modified\n'
-              '  - IMPORTNAT: Reference\n'
-              '  - NOTICE: Proposals that do not require modification\n'
-              '- The following json format should be followed.\n'
-              '{"files":[{"fileName":"<file_name>","reviews": [{"lineNumber":<line_number>,"reviewComment":"<review comment>"}]}]}\n'
-              '- If there is no review comment, please answer {"files":[]}\n'
-              )
+SYSTEM_PROMPT = ('You are a senior infrastracture engineer reviewing a git diff.\n'
+                'Please write a Markdown-formatted code review summary that can be used as a commit comment.\n'
+                'Please concatenate all content onto one line and use MarkDown syntax to indicate line breaks.\n'
+                'Please include sources in your review comments whenever possible.\n'
+                'The structure must include the following sections:\n\n'
+                '1. **Overview**: A high-level summary of what was changed and why.\n\n'
+                '2. **File-by-File Review**: For each file that has changes:\n'
+                '    - Describe the purpose of the change.\n'
+                '    - Provide review comments if needed.\n'
+                '    - Use the following labels for each comment:\n'
+                '        - **MUST**: Critical issues that must be fixed before merge.\n'
+                '        - **IMPORTANT**: Non-blocking but important improvements or considerations.\n'
+                '        - **NOTICE**: Optional suggestions or observations.\n\n'
+                'Format each section clearly using Markdown syntax. Be concise but informative.\n'
+                'Only output the Markdown — do not include any explanations outside of the formatted review.\n'
+                )
 USER_PROMPT = "Please review the following code differences.:\n\n"
 MODEL= "gemini-1.5-flash"
 
@@ -57,26 +61,11 @@ def get_ai_review(diff):
     return response_result
 
 def post_review_comments(review_result):
-    """レビュー結果をコメント投稿"""
-    print(f'review_result:\n{review_result}')
-    url = f'{PR_API_URL}/commits'
-    headers = {
-        'Authorization': f'token {GITHUB_TOKEN}',
-        'Accept': 'application/vnd.github+json'
-    }
-    pr_commits_response = requests.get(url, headers=headers)
-    pr_commits = pr_commits_response.json()
-    last_commit = pr_commits[-1]['sha']
-    for file in review_result["files"]:
-        for review in file["reviews"]:
-            comment_url = f'{PR_API_URL}/comments'
-            comment_data = {
-                'body': review["reviewComment"],
-                'commit_id': last_commit,
-                'path': file["fileName"],
-                'position': review["lineNumber"]
-            }
-            requests.post(comment_url, headers=headers, data=json.dumps(comment_data))
+    """レビュー結果をファイル出力"""
+    print(f'review_result: \n{review_result}')
+    with open("comments.md", 'w',encoding='utf-8') as f:
+        f.write(review_result)
+
 
 if __name__ == "__main__":
     diff = get_pr_diff()
