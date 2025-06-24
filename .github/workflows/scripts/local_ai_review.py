@@ -29,7 +29,7 @@ def get_pr_diff():
 
 def get_ai_review(diff):
     """AIによるコードレビュー"""
-    print(AI_API_KEY)
+    # print(AI_API_KEY)
     client = OpenAI(
         api_key=AI_API_KEY,
         base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
