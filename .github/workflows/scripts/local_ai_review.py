@@ -63,5 +63,5 @@ def get_ai_review(diff):
 
 if __name__ == "__main__":
     diff = get_pr_diff()
-    get_ai_review(diff)
+    print(get_ai_review(diff))
 

@@ -36,6 +36,7 @@ jobs:
           path: comments.md
 
   post-comments:
+    needs: ai-review
     runs-on: ubuntu-latest
     steps:
       - name: Download result for ai-review
