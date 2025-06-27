@@ -1,0 +1,13 @@
+[
+    {
+        "name": "app",
+        "image": "${image}",
+        "essential": true,
+        "portMappings": [
+            {
+                "containerPort": 5000,
+                "protocol": "tcp"
+            }
+        ]
+    }
+]

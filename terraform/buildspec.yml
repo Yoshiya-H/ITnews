@@ -1,0 +1,29 @@
+version: 0.2
+
+env:
+    variables:
+        AWS_DEFAULT_REGION: us-east-1
+        AWS_ACCOUNT_ID: 953422125712
+        IMAGE_REPO_NAME: flask-ecr-repo
+
+
+phases:
+    prebuild:
+        commands:
+            - echo "Logging in to Amazon ECR..."
+            - aws --version
+            - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+            - export IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+            - echo "IMAGE_TAG=$IMAGE_TAG"
+    build:
+        commands:
+            - echo Build start on $(date)
+            - docker build -t ${IMAGE_REPO_NAME}:$IMAGE_TAG
+            - docker tag ${IMAGE_REPO_NAME}:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/${IMAGE_REPO_NAME}:$IMAGE_TAG
+            - docker tag ${IMAGE_REPO_NAME}:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/${IMAGE_REPO_NAME}:latest
+    post_build:
+            - echo Build completed on $(date)
+            - docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:$IMAGE_TAG
+            - docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:latest
+            - echo "Writing image definitions file..."
+            - echo '[{"name":"app","imageUri:"'${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:$IMAGE_TAG'"}]' > imagedefinitions.json
