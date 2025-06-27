@@ -1,0 +1,58 @@
+name: AI Review
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  ai-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'
+  
+      - name: Install transformers
+        run: |
+          pip install openai
+          pip install PyGithub
+      
+      - name: AI Review
+        run: |
+          python ./.github/workflows/scripts/ai_review.py > comments.md
+        env:
+          AI_API_KEY: ${{ secrets.AI_API_KEY }}
+          REPOSITORY: "Yoshiya-H/ITnews"
+          PR_NUMBER: ${{ github.event.number }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload result for ai-review
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-review-commmets
+          path: comments.md
+
+  post-comments:
+    needs: ai-review
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download result for ai-review
+        uses: actions/download-artifact@v4
+        with:
+          name: ai-review-commmets
+
+      - name: Post comments
+        run: |
+          gh pr comment ${{ github.event.number }} --body-file comments.md
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
