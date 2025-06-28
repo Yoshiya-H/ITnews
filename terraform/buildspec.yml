@@ -15,16 +15,16 @@ phases:
             - aws --version
             - aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${REPOSITORY_HOST}
             - IMAGE_TAG=$(echo ${CODEBUILD_RESOLVED_SOURCE_VERSION} | cut -c 1-7)
-            - echo "IMAGE_TAG=$IMAGE_TAG"
+            - echo "IMAGE_TAG=${IMAGE_TAG}"
 
     build:
         commands:
             - echo Build start on $(date)
             - |
               for IMAGE_REPO_NAME in ${IMAGE_REPO_NAME_PYTHON}; do
-                docker build -t ${IMAGE_REPO_NAME}:$IMAGE_TAG .
-                docker tag ${IMAGE_REPO_NAME}:$IMAGE_TAG ${REPOSITORY_HOST}/${IMAGE_REPO_NAME}:$IMAGE_TAG
-                docker tag ${IMAGE_REPO_NAME}:$IMAGE_TAG ${REPOSITORY_HOST}/${IMAGE_REPO_NAME}:latest
+                docker build -t ${IMAGE_REPO_NAME}:${IMAGE_TAG} .
+                docker tag ${IMAGE_REPO_NAME}:${IMAGE_TAG} ${REPOSITORY_HOST}/${IMAGE_REPO_NAME}:${IMAGE_TAG}
+                docker tag ${IMAGE_REPO_NAME}:${IMAGE_TAG} ${REPOSITORY_HOST}/${IMAGE_REPO_NAME}:latest
               done
 
     post_build:
@@ -33,10 +33,10 @@ phases:
             - printf '[' > imagedefinitions.json
             - |
               for IMAGE_REPO_NAME in ${IMAGE_REPO_NAME_PYTHON}; do
-                docker push ${REPOSITORY_HOST}/${IMAGE_REPO_NAME}:$IMAGE_TAG
+                docker push ${REPOSITORY_HOST}/${IMAGE_REPO_NAME}:${IMAGE_TAG}
                 docker push ${REPOSITORY_HOST}/${IMAGE_REPO_NAME}:latest
                 echo "Writing image definitions file..."
-                printf '{"${IMAGE_REPO_NAME}":"app","imageUri:"%s"}' ${REPOSITORY_HOST}/${IMAGE_REPO_NAME}:$IMAGE_TAG >> imagedefinitions.json
+                printf '{"name":"%s","imageUri:"%s"}' ${IMAGE_REPO_NAME} ${REPOSITORY_HOST}/${IMAGE_REPO_NAME}:${IMAGE_TAG} >> imagedefinitions.json
               done
             - printf ']' >> imagedefinitions.json
 
