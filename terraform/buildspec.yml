@@ -4,27 +4,36 @@ env:
     variables:
         AWS_DEFAULT_REGION: us-east-1
         AWS_ACCOUNT_ID: 953422125712
-        IMAGE_REPO_NAME: flask-ecr-repo
-
+        IMAGE_REPO_NAME_PHP: ecr-php-app
+        IMAGE_REPO_NAME_PYTHON: ecr-python-app
 
 phases:
     pre_build:
         commands:
             - echo "Logging in to Amazon ECR..."
+            - REPOSITORY_HOST="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
             - aws --version
-            - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
-            - export IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+            - aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${REPOSITORY_HOST}
+            - IMAGE_TAG=(echo ${CODEBUILD_RESOLVED_SOURCE_VERSION} | cut -c 1-7)
             - echo "IMAGE_TAG=$IMAGE_TAG"
     build:
         commands:
             - echo Build start on $(date)
-            - docker build -t ${IMAGE_REPO_NAME}:$IMAGE_TAG
-            - docker tag ${IMAGE_REPO_NAME}:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/${IMAGE_REPO_NAME}:$IMAGE_TAG
-            - docker tag ${IMAGE_REPO_NAME}:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/${IMAGE_REPO_NAME}:latest
+            - |
+              for IMAGE_REPO_NAME in ${IMAGE_REPO_NAME_PYTHON}; do
+                docker build -t ${IMAGE_REPO_NAME}:$IMAGE_TAG
+                docker tag ${IMAGE_REPO_NAME}:$IMAGE_TAG ${REPOSITORY_HOST}/${IMAGE_REPO_NAME}:$IMAGE_TAG
+                docker tag ${IMAGE_REPO_NAME}:$IMAGE_TAG ${REPOSITORY_HOST}/${IMAGE_REPO_NAME}:latest
+              done
     post_build:
         commands:
             - echo Build completed on $(date)
-            - docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:$IMAGE_TAG
-            - docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:latest
-            - echo "Writing image definitions file..."
-            - echo '[{"name":"app","imageUri:"'${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:$IMAGE_TAG'"}]' > imagedefinitions.json
+            - printf '[' > imagedefinitions.json
+            - |
+              for IMAGE_REPO_NAME in${IMAGE_REPO_NAME_PYTHON}; do
+                docker push ${REPOSITORY_HOST}/${IMAGE_REPO_NAME}:$IMAGE_TAG
+                docker push ${REPOSITORY_HOST}/${IMAGE_REPO_NAME}:latest
+                echo "Writing image definitions file..."
+                printf '{"${IMAGE_REPO_NAME}":"app","imageUri:"%s"}' ${REPOSITORY_HOST}/${IMAGE_REPO_NAME}:$IMAGE_TAG >> imagedefinitions.json
+              done
+            - printf ']' >> imagedefinitions.json
