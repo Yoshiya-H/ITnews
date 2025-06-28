@@ -4,7 +4,7 @@ env:
     variables:
         AWS_DEFAULT_REGION: us-east-1
         AWS_ACCOUNT_ID: 953422125712
-        IMAGE_REPO_NAME_LIST: "ecr-php-frontend ecr-python-frontend"
+        IMAGE_REPO_NAME_LIST: "ecr-php-frontend ecr-python-backend"
 
 phases:
     pre_build:
