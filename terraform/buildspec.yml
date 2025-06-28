@@ -8,7 +8,7 @@ env:
 
 
 phases:
-    prebuild:
+    pre_build:
         commands:
             - echo "Logging in to Amazon ECR..."
             - aws --version
