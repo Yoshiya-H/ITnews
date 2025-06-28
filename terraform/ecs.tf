@@ -68,6 +68,7 @@ resource "aws_ecs_service" "ecs_app" {
   }
   load_balancer {
     target_group_arn = aws_alb_target_group.alb_tgp.arn
+    # imagedefinitions.json 内のnameと連動
     container_name = "app"
     container_port = 5000
   }
