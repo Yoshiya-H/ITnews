@@ -31,6 +31,6 @@ resource "aws_codebuild_project" "app" {
   source {
     type = "GITHUB"
     location = "https://github.com/Yoshiya-H/ITnews.git"
-    buildspec = "buildspec.yml"
+    buildspec = "terraform/buildspec.yml"
   }
 }
