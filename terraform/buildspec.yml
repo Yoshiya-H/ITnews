@@ -36,9 +36,10 @@ phases:
                 docker push ${REPOSITORY_HOST}/${IMAGE_REPO_NAME}:latest
                 echo "Writing image definitions file..."
                 container_name="${IMAGE_REPO_NAME#ecr-}"
-                printf '{"name":"%s","imageUri":"%s"}' ${container_name} ${REPOSITORY_HOST}/${IMAGE_REPO_NAME}:${IMAGE_TAG} >> imagedefinitions.json
+                printf '{"name":"%s","imageUri":"%s"}' ${container_name} ${REPOSITORY_HOST}/${IMAGE_REPO_NAME}:${IMAGE_TAG}, >> imagedefinitions.json
               done
             - printf ']' >> imagedefinitions.json
+            - sed -i 's/}{/},{/g' imagedefinitions.json
 
 artifacts:
     files:
