@@ -1,6 +1,16 @@
-# ECRリポジトリの作成
-resource "aws_ecr_repository" "app_repo" {
-  name = var.ecr_repo_name
+# ECRリポジトリの作成 (Python)
+resource "aws_ecr_repository" "python_app_repo" {
+  name = var.python_ecr_repo_name
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+}
+
+# ECRリポジトリの作成 (PHP)
+resource "aws_ecr_repository" "php_app_repo" {
+  name = var.php_ecr_repo_name
   image_tag_mutability = "MUTABLE"
 
   image_scanning_configuration {

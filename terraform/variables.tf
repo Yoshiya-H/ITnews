@@ -3,21 +3,18 @@ variable "aws_region" {
   default = "us-east-1"
 }
 
-variable "ecr_repo_name" {
+variable "python_ecr_repo_name" {
   type = string
+  description = "Name of the ECR repository for Python backend"
+}
+
+variable "php_ecr_repo_name" {
+  type = string
+  description = "Name of the ECR repository for PHP frontend"
 }
 
 variable "ecs_cluster_name" {
   type = string
-}
-
-variable "ecr_image_url" {
-  description = "URL of the Docker image in ECR (e.g., 123456789012.dkr.ecr.ap-northeast-1.amazonaws.com/my-app:latest)"
-  type = string
-  validation {
-    condition = can(regex("^[0-9]+\\.dkr\\.ecr\\.[a-z0-9-]+\\.amazonaws\\.com/.+:.+$", var.ecr_image_url))
-    error_message = "The ecs_image_url must be a valid ECR repository URL format."
-  }
 }
 
 variable "github_token" {

@@ -1,5 +1,9 @@
-output "ecr_repository_url" {
-  value = aws_ecr_repository.app_repo.repository_url
+output "python_app_repo_url" {
+  value = aws_ecr_repository.python_app_repo.repository_url
+}
+
+output "php_app_repo_url" {
+  value = aws_ecr_repository.php_app_repo.repository_url
 }
 
 output "ecs_cluster_name" {
