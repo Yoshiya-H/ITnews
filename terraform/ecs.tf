@@ -12,10 +12,10 @@ resource "aws_lb" "app_alb" {
   }
 }
 
-# ターゲットグループ
+# ターゲットグループ (PHPフロントエンド用)
 resource "aws_alb_target_group" "alb_tgp" {
   name = "ecs-alb-tgp"
-  port = 5000
+  port = 80
   protocol = "HTTP"
   target_type = "ip"
   vpc_id = aws_vpc.main.id
@@ -51,7 +51,13 @@ resource "aws_ecs_task_definition" "ecs_app" {
   cpu = 256
   memory = 512
   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
-  container_definitions = templatefile("./ecsTaskdefinition_ecs_app.json", { image = var.ecr_image_url })
+  container_definitions = templatefile(
+    "./ecsTaskdefinition_ecs_app.json",
+    {
+      python_image_uri = "${aws_ecr_repository.python_app_repo.repository_url}:latest",
+      php_image_uri = "${aws_ecr_repository.php_app_repo.repository_url}:latest"
+    }
+  )
 }
 
 #ECSサービス
@@ -68,9 +74,10 @@ resource "aws_ecs_service" "ecs_app" {
   }
   load_balancer {
     target_group_arn = aws_alb_target_group.alb_tgp.arn
-    # imagedefinitions.json 内のnameと連動
-    container_name = "app"
-    container_port = 5000
+    # ecsTaskdefinition_ecs_app.json 内で定義されたnameと連動
+    # imagedefinitions.jsonでもこのnameを使用する
+    container_name = "php-frontend"
+    container_port = 80
   }
   depends_on = [ aws_alb_listener.alb_listener_http ]
 }

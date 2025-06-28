@@ -1,12 +1,29 @@
 [
     {
-        "name": "app",
-        "image": "${image}",
+        "name": "python-backend",
+        "image": "${python_image_uri}",
         "essential": true,
         "portMappings": [
             {
                 "containerPort": 5000,
                 "protocol": "tcp"
+            }
+        ]
+    },
+    {
+        "name": "php-frontend",
+        "image": "${php_image_uri}",
+        "essential": true,
+        "portMappings": [
+            {
+                "containerPort": 80,
+                "protocol": "tcp"
+            }
+        ],
+        "dependsOn": [
+            {
+                "containerName": "python-backend",
+                "condition": "START"
             }
         ]
     }

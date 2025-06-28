@@ -4,8 +4,7 @@ env:
     variables:
         AWS_DEFAULT_REGION: us-east-1
         AWS_ACCOUNT_ID: 953422125712
-        IMAGE_REPO_NAME_PHP: ecr-php-app
-        IMAGE_REPO_NAME_ECR: flask-ecr-repo
+        IMAGE_REPO_NAME_LIST: "ecr-php-frontend ecr-python-backend"
 
 phases:
     pre_build:
@@ -21,7 +20,7 @@ phases:
         commands:
             - echo Build start on $(date)
             - |
-              for IMAGE_REPO_NAME in ${IMAGE_REPO_NAME_ECR}; do
+              for IMAGE_REPO_NAME in ${IMAGE_REPO_NAME_LIST}; do
                 docker build -t ${IMAGE_REPO_NAME}:${IMAGE_TAG} .
                 docker tag ${IMAGE_REPO_NAME}:${IMAGE_TAG} ${REPOSITORY_HOST}/${IMAGE_REPO_NAME}:${IMAGE_TAG}
                 docker tag ${IMAGE_REPO_NAME}:${IMAGE_TAG} ${REPOSITORY_HOST}/${IMAGE_REPO_NAME}:latest
@@ -32,11 +31,12 @@ phases:
             - echo Build completed on $(date)
             - printf '[' > imagedefinitions.json
             - |
-              for IMAGE_REPO_NAME in ${IMAGE_REPO_NAME_ECR}; do
+              for IMAGE_REPO_NAME in ${IMAGE_REPO_NAME_LIST}; do
                 docker push ${REPOSITORY_HOST}/${IMAGE_REPO_NAME}:${IMAGE_TAG}
                 docker push ${REPOSITORY_HOST}/${IMAGE_REPO_NAME}:latest
                 echo "Writing image definitions file..."
-                printf '{"name":"app","imageUri":"%s"}' ${REPOSITORY_HOST}/${IMAGE_REPO_NAME}:${IMAGE_TAG} >> imagedefinitions.json
+                container_name="${IMAGE_REPO_NAME#ecr-}"
+                printf '{"name":"%s","imageUri":"%s"}' ${container_name} ${REPOSITORY_HOST}/${IMAGE_REPO_NAME}:${IMAGE_TAG} >> imagedefinitions.json
               done
             - printf ']' >> imagedefinitions.json
 
