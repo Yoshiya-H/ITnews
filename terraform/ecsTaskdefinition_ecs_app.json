@@ -2,7 +2,15 @@
     {
         "name": "python-backend",
         "image": "${python_image_uri}",
-        "essential": true,
+        "essential": false,
+        "logConfiguration": {
+            "logDriver": "awslogs",
+            "options": {
+              "awslogs-region": "us-east-1",
+              "awslogs-stream-prefix": "php",
+              "awslogs-group": "/ecs/frontend/php"
+            }
+          },
         "portMappings": [
             {
                 "containerPort": 5000,
@@ -14,6 +22,14 @@
         "name": "php-frontend",
         "image": "${php_image_uri}",
         "essential": true,
+        "logConfiguration": {
+            "logDriver": "awslogs",
+            "options": {
+              "awslogs-region": "us-east-1",
+              "awslogs-stream-prefix": "python",
+              "awslogs-group": "/ecs/backend/python"
+            }
+          },
         "portMappings": [
             {
                 "containerPort": 80,
