@@ -2,6 +2,7 @@
     "Version": "2012-10-17",
     "Statement": [
         {
+            "Sid": "Pipeline",
             "Effect": "Allow",
             "Action": [
                 "codebuild:*",
@@ -11,6 +12,16 @@
                 "iam:Passrole"
             ],
             "Resource": "*"
+        },
+        {
+            "Sid": "ConnectionsAccess",
+            "Effect": "Allow",
+            "Action": [
+                "codestar-connections:UseConnection",
+                "codestar-connections:GetConnection",
+                "codestar-connections:ListConnections"
+            ],
+            "Resource": "${codestar_connections_arn}"
         }
     ]
 }

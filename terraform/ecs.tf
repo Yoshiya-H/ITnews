@@ -41,6 +41,7 @@ resource "aws_alb_listener" "alb_listener_http" {
         type = "forward"
         target_group_arn = aws_alb_target_group.alb_tgp.arn
     }
+    depends_on = [aws_alb_target_group.alb_tgp]
 }
 
 # ECSタスク定義
