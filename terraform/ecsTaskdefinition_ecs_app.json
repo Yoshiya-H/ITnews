@@ -21,7 +21,7 @@
     {
         "name": "php-frontend",
         "image": "${php_image_uri}",
-        "essential": true,
+        "essential": false,
         "logConfiguration": {
             "logDriver": "awslogs",
             "options": {
