@@ -69,6 +69,7 @@ resource "aws_ecs_service" "ecs_app" {
   task_definition = aws_ecs_task_definition.ecs_app.arn
   launch_type = "FARGATE"
   desired_count = 1
+  enable_execute_command = true
   network_configuration {
     subnets = [ aws_subnet.public_a.id, aws_subnet.public_c.id ]
     security_groups = [ aws_security_group.ecs_sg.id ]
