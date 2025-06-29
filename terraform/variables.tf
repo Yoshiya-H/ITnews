@@ -16,9 +16,3 @@ variable "php_ecr_repo_name" {
 variable "ecs_cluster_name" {
   type = string
 }
-
-variable "github_token" {
-  type = string
-  description = "Github Personal Access Token"
-  sensitive = true
-}

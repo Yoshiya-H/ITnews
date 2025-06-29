@@ -13,3 +13,12 @@ output "ecs_cluster_name" {
 output "alb_dns_name" {
   value = aws_lb.app_alb.dns_name
 }
+
+output "codestar-connections" {
+  value = aws_codestarconnections_connection.github-connection.name
+  description = <<EOT
+  The aws_codestarconnections_connection resource is created in the state PENDING. 
+  Authentication with the connection provider must be completed in the AWS Console.
+  https://console.aws.amazon.com/codesuite/settings/connections
+  EOT
+}

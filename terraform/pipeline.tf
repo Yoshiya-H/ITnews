@@ -6,12 +6,22 @@ resource "aws_iam_role" "codepipeline_role" {
 resource "aws_iam_role_policy" "codepipeline_policy" {
   name = "codepipeline-inline-policy"
   role = aws_iam_role.codepipeline_role.id
-  policy = file("./codepipelineInlinePolicy.json")
+  policy = templatefile(
+    "./codepipelineInlinePolicy.json",
+    {
+      codestar_connections_arn = aws_codestarconnections_connection.github.arn
+    }
+  )
 }
 
 resource "aws_s3_bucket" "artifact_bucket" {
   bucket = "ecs-app-codepipeline-artifacts"
   force_destroy = true
+}
+
+resource "aws_codestarconnections_connection" "github" {
+  name = "github-connection"
+  provider_type = "GitHub"
 }
 
 resource "aws_codepipeline" "app_pipeline" {
@@ -27,15 +37,14 @@ resource "aws_codepipeline" "app_pipeline" {
     action {
       name = "Source"
       category = "Source"
-      owner = "ThirdParty"
-      provider = "GitHub"
+      owner = "AWS"
+      provider = "CodeStarSourceConnection"
       version = "1"
       output_artifacts = ["source_output"]
       configuration = {
-        Owner = "Yoshiya-H"
-        Repo = "ITnews"
-        Branch = "main"
-        OAuthToken = var.github_token
+        ConnectionArn = aws_codestarconnections_connection.github.arn
+        FullRepositoryId = "Yoshiya-H/ITnews"
+        BranchName = "main"
       }
     }
   }
