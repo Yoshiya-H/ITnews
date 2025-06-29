@@ -10,7 +10,7 @@ SYSTEM_PROMPT = ('You are a senior infrastracture engineer reviewing a git diff.
                 '- Write in Japanese.\n'
                 '- Indent lists with two spaces and one space after the list marker.\n'
                 '- Use code blocks only when necessary.\n'
-                '- Do not surround the entire review comment with a code block!!!!'
+                '- Write review comments as Markdown without wrapping them in code blocks.\n'
                 'The structure must include the following sections:\n\n'
                 '1. **Overview**: A high-level summary of what was changed and why.\n\n'
                 '2. **File-by-File Review**: For each file that has changes:\n'
