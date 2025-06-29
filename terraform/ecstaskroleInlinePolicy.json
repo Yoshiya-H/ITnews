@@ -10,6 +10,17 @@
                 "logs:PutLogEvents"
             ],
             "Resource": "arn:aws:logs:*:*:log-group:/aws/ecs/*:log-stream:*"
+        },
+        {
+            "Sid": "ExecuteCommand",
+            "Effect": "Allow",
+            "Action": [
+                "ssmmessages:CreateControlChannel",
+                "ssmmessages:CreateDataChannel",
+                "ssmmessages:OpenControlChannel",
+                "ssmmessages:OpenDataChannel"
+            ],
+            "Resource": "*"
         }
     ]
 }
