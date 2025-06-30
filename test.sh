@@ -1,9 +1,12 @@
 #!/bin/bash
 
-list='var-1 var-2 var-3'
-
-for var in $list; do
-	num="${var#var-}"
-	echo $num
-done
-
+# /proc/net/tcpから直接確認
+awk '
+BEGIN { print "Proto Local-Address State PID" }
+NR > 1 {
+    split($2, a, ":")
+    port = strtonum("0x" a[2])
+    if (port == 323) {
+        printf "tcp %s:%d %s\n", a[1], port, $4
+    }
+}' /proc/net/tcp
