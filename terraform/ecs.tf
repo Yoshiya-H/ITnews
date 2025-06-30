@@ -25,7 +25,7 @@ resource "aws_alb_target_group" "alb_tgp" {
     timeout = 5
     healthy_threshold = 2
     unhealthy_threshold = 2
-    matcher = "200"
+    matcher = "200-399"
   }
   tags = {
     Name = "ecs-alb-tgp"
